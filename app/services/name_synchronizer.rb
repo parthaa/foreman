@@ -15,10 +15,12 @@ class NameSynchronizer
   # we have to use write_attribute, since host#name= is delegated to primary interface
   # which triggers the sync
   def sync_name
-    @host.send :write_attribute, :name, @interface.name
+    name = Setting[:use_shortname_for_vms] ? @interface.shortname : @interface.name
+    @host.send :write_attribute, :name, name
   end
 
   def sync_required?
-    @interface.primary? && @host.present? && (@host.name != @interface.name)
+    name = Setting[:use_shortname_for_vms] ? @interface.shortname : @interface.name
+    @interface.primary? && @host.present? && (@host.name != name)
   end
 end
