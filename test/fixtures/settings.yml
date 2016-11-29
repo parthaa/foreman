@@ -363,3 +363,8 @@ attribute75:
   category: Setting::Notification
   default: "http://theforeman.org/feed.xml"
   description: 'Default URL for RSS feed notifications'
+attribute76:
+  name: append_domain_name_for_hosts
+  category: Setting::General
+  default: "true"
+  description: "Should append domain names when new hosts are provisioned"
