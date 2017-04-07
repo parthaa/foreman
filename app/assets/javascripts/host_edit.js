@@ -1,5 +1,4 @@
 //= require parameter_override
-
 $(document).on('ContentLoad', function(){onHostEditLoad()});
 $(document).on('AddedClass', function(event, link){load_puppet_class_parameters(link)});
 
@@ -94,7 +93,7 @@ function update_capabilities(capabilities){
   capabilities = capabilities.split(" ")
   $('#image_provisioning').empty();
   $('#image_selection').appendTo($('#image_provisioning'));
-  update_provisioning_image();
+  tfm.hosts.update_provisioning_image();
   $('#manage_network').empty();
   $('#subnet_selection').appendTo($('#manage_network'));
 
@@ -247,7 +246,7 @@ function handleHostgroupChangeEdit(element, host_id, host_changed) {
   } else { // edit host
     set_inherited_value(element);
     update_puppetclasses(element);
-    reload_host_params();
+    tfm.hosts.reload_host_params();
   }
 }
 
@@ -344,152 +343,19 @@ function subnet_contains(network, cidr, ip) {
 }
 
 function architecture_selected(element){
-  var url = $(element).attr('data-url');
-  var type = $(element).attr('data-type');
-  var attrs = {};
-  attrs[type] = attribute_hash(['architecture_id', 'organization_id', 'location_id']);
-  tfm.tools.showSpinner();
-  $.ajax({
-    data: attrs,
-    type:'post',
-    url: url,
-    complete: function(){
-      reloadOnAjaxComplete(element);
-    },
-    success: function(request) {
-      $('#os_select').html(request);
-    }
-  })
+  tfm.hosts.architecture_selected(element);
 }
 
 function os_selected(element){
-  var url = $(element).attr('data-url');
-  var type = $(element).attr('data-type');
-  var attrs = {};
-  attrs[type] = attribute_hash(['operatingsystem_id', 'organization_id', 'location_id']);
-  tfm.tools.showSpinner();
-  $.ajax({
-    data: attrs,
-    type:'post',
-    url: url,
-    complete: function(){
-      reloadOnAjaxComplete(element);
-    },
-    success: function(request) {
-      $('#media_select').html(request);
-      reload_host_params();
-      reload_puppetclass_params();
-    }
-  });
-  update_provisioning_image();
-}
-function update_provisioning_image(){
-  var compute_id = $('[name$="[compute_resource_id]"]').val();
-  var arch_id = $('[name$="[architecture_id]"]').val();
-  var os_id = $('[name$="[operatingsystem_id]"]').val();
-  if((compute_id == undefined) || (compute_id == "") || (arch_id == "") || (os_id == "")) return;
-  var image_options = $('#image_selection select').empty();
-  $.ajax({
-      data: {'operatingsystem_id': os_id, 'architecture_id': arch_id},
-      type:'get',
-      url: foreman_url('/compute_resources/'+compute_id+'/images'),
-      dataType: 'json',
-      success: function(result) {
-        $.each(result, function() {
-          image_options.append($("<option />").val(this.image.uuid).text(this.image.name));
-        });
-        if (image_options.find('option').length > 0) {
-          if ($('#host_provision_method_image')[0].checked) {
-            if ($('#provider').val() == 'Libvirt') {
-              libvirt_image_selected(image_options);
-            } else if ($('#provider').val() == 'Ovirt') {
-              var template_select = $('#host_compute_attributes_template');
-              if (template_select.length > 0) {
-                template_select.val(image_options.val());
-                ovirt_templateSelected(image_options);
-              }
-            }
-          }
-        }
-      }
-    })
+  tfm.hosts.os_selected(element);
 }
 
 function medium_selected(element){
-  var url = $(element).attr('data-url');
-  var type = $(element).attr('data-type');
-  var attrs = {};
-  attrs[type] = attribute_hash(['medium_id', 'operatingsystem_id', 'architecture_id']);
-  attrs[type]["use_image"] = $('*[id*=use_image]').attr('checked') == "checked";
-  $.ajax({
-    data: attrs,
-    type:'post',
-    url: url,
-    success: function(request) {
-      $('#image_details').html(request);
-    }
-  })
+  tfm.hosts.medium_selected(element);
 }
 
 function use_image_selected(element){
-  var url = $(element).attr('data-url');
-  var type = $(element).attr('data-type');
-  var attrs = {};
-  attrs[type] = attribute_hash(['medium_id', 'operatingsystem_id', 'architecture_id', 'model_id']);
-  attrs[type]['use_image'] = ($(element).attr('checked') == "checked");
-  $.ajax({
-    data: attrs,
-    type: 'post',
-    url:  url,
-    success: function(response) {
-      var field = $('*[id*=image_file]');
-      if (attrs[type]["use_image"]) {
-        if (field.val() == "") field.val(response["image_file"]);
-      } else
-        field.val("");
-
-      field.attr("disabled", !attrs[type]["use_image"]);
-    }
-  });
-}
-
-function reload_host_params(){
-  var host_id = $("form").data('id');
-  var url = $('#params-tab').data('url');
-  var data = serializeForm().replace('method=patch', 'method=post');
-  if (url.length > 0) {
-    data = data + '&host_id=' + host_id;
-    load_with_placeholder('inherited_parameters', url, data);
-  }
-}
-
-function reload_puppetclass_params(){
-  var host_id = $("form").data('id');
-  var url2 = $('#params-tab').data('url2');
-  var data = serializeForm().replace('method=patch', 'method=post');
-  if (url2.match('hostgroups')) {
-    data = data + '&hostgroup_id=' + host_id
-  } else {
-    data = data + '&host_id=' + host_id
-  }
-  load_with_placeholder('inherited_puppetclasses_parameters', url2, data)
-}
-
-function load_with_placeholder(target, url, data){
-  if(url==undefined) return;
-  var placeholder = $('<tr id="' + target + '_loading" >'+
-            '<td colspan="4">'+ spinner_placeholder(__('Loading parameters...')) + '</td></tr>');
-        $('#' + target + ' tbody').replaceWith(placeholder);
-        $.ajax({
-          type:'post',
-          url: url,
-          data: data,
-          success:
-            function(result, textstatus, xhr) {
-              placeholder.closest('#' + target ).replaceWith($(result));
-              mark_params_override()
-            }
-        });
+  tfm.hosts.use_image_selected(element);
 }
 
 function onHostEditLoad(){
@@ -548,8 +414,8 @@ $(document).on('change', '.interface_domain', function () {
   clearError($(this).closest('fieldset').find('.interface_ip'));
   clearError($(this).closest('fieldset').find('.interface_ip6'));
   interface_domain_selected(this);
-  reload_host_params();
-  reload_puppetclass_params();
+  tfm.hosts.reload_host_params();
+  tfm.hosts.reload_puppetclass_params();
 });
 
 function clearIpField(parent, childclass) {
