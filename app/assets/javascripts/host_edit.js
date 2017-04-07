@@ -1,5 +1,12 @@
 //= require parameter_override
 
+var HOST_EDIT_ATTRIBUTES = {
+  "architecture" : ['architecture_id', 'organization_id', 'location_id'],
+  "os" : ['operatingsystem_id', 'organization_id', 'location_id'],
+  "medium" : ['medium_id', 'operatingsystem_id', 'architecture_id'],
+  "image" : ['medium_id', 'operatingsystem_id', 'architecture_id', 'model_id']
+}
+
 $(document).on('ContentLoad', function(){onHostEditLoad()});
 $(document).on('AddedClass', function(event, link){load_puppet_class_parameters(link)});
 
@@ -347,7 +354,7 @@ function architecture_selected(element){
   var url = $(element).attr('data-url');
   var type = $(element).attr('data-type');
   var attrs = {};
-  attrs[type] = attribute_hash(['architecture_id', 'organization_id', 'location_id']);
+  attrs[type] = attribute_hash(HOST_EDIT_ATTRIBUTES["architecture"]);
   tfm.tools.showSpinner();
   $.ajax({
     data: attrs,
@@ -366,7 +373,7 @@ function os_selected(element){
   var url = $(element).attr('data-url');
   var type = $(element).attr('data-type');
   var attrs = {};
-  attrs[type] = attribute_hash(['operatingsystem_id', 'organization_id', 'location_id']);
+  attrs[type] = attribute_hash(HOST_EDIT_ATTRIBUTES["os"]);
   tfm.tools.showSpinner();
   $.ajax({
     data: attrs,
@@ -419,7 +426,7 @@ function medium_selected(element){
   var url = $(element).attr('data-url');
   var type = $(element).attr('data-type');
   var attrs = {};
-  attrs[type] = attribute_hash(['medium_id', 'operatingsystem_id', 'architecture_id']);
+  attrs[type] = attribute_hash(HOST_EDIT_ATTRIBUTES["medium"]);
   attrs[type]["use_image"] = $('*[id*=use_image]').attr('checked') == "checked";
   $.ajax({
     data: attrs,
@@ -435,7 +442,7 @@ function use_image_selected(element){
   var url = $(element).attr('data-url');
   var type = $(element).attr('data-type');
   var attrs = {};
-  attrs[type] = attribute_hash(['medium_id', 'operatingsystem_id', 'architecture_id', 'model_id']);
+  attrs[type] = attribute_hash(HOST_EDIT_ATTRIBUTES["image"]);
   attrs[type]['use_image'] = ($(element).attr('checked') == "checked");
   $.ajax({
     data: attrs,
