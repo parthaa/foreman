@@ -720,4 +720,8 @@ Foreman::AccessControl.map do |permission_set|
     map.permission :revoke_personal_access_tokens,
                    :"api/v2/personal_access_tokens" => [:destroy]
   end
+
+  permission_set.security_block :table_preferences do |map|
+    map.permission :access_table_preferences, {:"api/v2/table_preferences" => [:index, :create, :destroy, :show, :update]}
+  end
 end

@@ -38,7 +38,7 @@ class RolesList
 
     def default_role
       {
-        'Default role' => { :permissions => [:view_bookmarks, :view_tasks], :description => 'Role that is automatically assigned to every user in the system. Adding a permission grants it to everybody' }
+        'Default role' => { :permissions => [:view_bookmarks, :view_tasks, :access_table_preferences], :description => 'Role that is automatically assigned to every user in the system. Adding a permission grants it to everybody' }
       }
     end
 

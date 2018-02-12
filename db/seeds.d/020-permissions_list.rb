@@ -1,5 +1,6 @@
 class PermissionsList
   class << self
+    # rubocop:disable MethodLength
     def permissions
       [
         ['Architecture', 'view_architectures'],
@@ -37,6 +38,7 @@ class PermissionsList
         ['ConfigGroup', 'edit_config_groups'],
         ['ConfigGroup', 'destroy_config_groups'],
         [nil, 'access_dashboard'],
+        [nil, 'access_table_preferences'],
         ['Domain', 'view_domains'],
         ['Domain', 'create_domains'],
         ['Domain', 'edit_domains'],
@@ -178,5 +180,6 @@ class PermissionsList
         ['User', 'destroy_users']
       ]
     end
+    # rubocop:enable MethodLength
   end
 end
