@@ -202,6 +202,12 @@ Foreman::Application.routes.draw do
 
       resources :override_values, :only => [:update, :destroy]
 
+      resources :user_columns, :only => [:index, :create] do
+        collection do
+          get :columns
+        end
+      end
+
       resources :statistics, :only => [:index]
 
       get '/', :to => 'home#index'
