@@ -37,6 +37,7 @@ class PermissionsList
         ['ConfigGroup', 'edit_config_groups'],
         ['ConfigGroup', 'destroy_config_groups'],
         [nil, 'access_dashboard'],
+        [nil, 'access_user_columns'],
         ['Domain', 'view_domains'],
         ['Domain', 'create_domains'],
         ['Domain', 'edit_domains'],
