@@ -5,6 +5,7 @@ require 'English'
 # All are loaded and populated early but are loaded only once
 require_dependency 'foreman/access_permissions'
 require_dependency 'menu/loader'
+
 require_dependency 'foreman/plugin'
 
 # Other internal dependencies, may be autoloaded

@@ -106,7 +106,7 @@ module Foreman #:nodoc:
 
     def_field :name, :description, :url, :author, :author_url, :version, :path
     attr_reader :id, :logging, :provision_methods, :compute_resources, :to_prepare_callbacks,
-                :facets, :rbac_registry, :dashboard_widgets, :info_providers
+                :facets, :rbac_registry, :dashboard_widgets, :info_providers, :column_resources
 
     # Lists plugin's roles:
     # Foreman::Plugin.find('my_plugin').registered_roles
@@ -126,6 +126,7 @@ module Foreman #:nodoc:
       @controller_action_scopes = {}
       @dashboard_widgets = []
       @rabl_template_extensions = {}
+      @column_resources = {}
     end
 
     def report_scanner_registry
@@ -219,6 +220,20 @@ module Foreman #:nodoc:
     # end
     def extend_page(virtual_path, &block)
       Pagelets::Manager.with_key(virtual_path, &block) if block_given?
+    end
+
+    # Add a user column resource.
+    # Usage:
+    #
+    # column_resource(:subscriptions) do |resource|
+    #   resource.column :account,
+    #                       :description => N_("Account Number"),
+    #                       :path => "account_number",
+    #                       :default_enabled => false
+    # end
+    def column_resource(resource, &block)
+      @column_resources[resource] ||= []
+      @column_resources[resource].push(*::ColumnRegistry::Manager.generate_columns(&block)) if block_given?
     end
 
     def tests_to_skip(hash)
