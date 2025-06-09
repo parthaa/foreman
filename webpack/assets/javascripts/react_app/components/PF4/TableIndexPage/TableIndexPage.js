@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { QuestionCircleIcon } from '@patternfly/react-icons';
 import { useHistory } from 'react-router-dom';
@@ -165,15 +165,18 @@ const TableIndexPage = ({
     pushToHistory: updateParamsByUrl,
   });
 
-  useEffect(() => {
-    if (restrictedSearchQuery) {
+  const hasRestrictedSearchSetup = useRef(false);
+  if (!hasRestrictedSearchSetup.current) {
+    const restrictedSearch = restrictedSearchQuery(search) ?? (search || '');
+    if (restrictedSearch) {
       const queryParams = {
         ...params,
         search: restrictedSearchQuery(search) ?? (search || ''),
       };
       setParamsAndAPI(queryParams);
     }
-  }, []);
+    hasRestrictedSearchSetup.current = true;
+  }
 
   const onPagination = newPagination => {
     setParamsAndAPI({ ...params, ...newPagination });
